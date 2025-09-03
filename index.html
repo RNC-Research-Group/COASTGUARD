@@ -148,7 +148,7 @@
         var r;
         if (p.site_id.startsWith("nzd")) {
           var url = `https://uoa-eresearch.github.io/CoastSat/data/${p.site_id}/transect_time_series_tidally_corrected.csv`
-          var vedgesat_url = `Data/${p.site_id}/transect_time_series.csv`
+          var vedgesat_url = `Data/${p.site_id}/transect_time_series_smoothed.csv`
           r = results[p.id];
         } else {
           var url = `https://uoa-eresearch.github.io/CoastSat/shoreline_data_run6/${p.site_id}/time_series_tidally_corrected.csv`
@@ -228,7 +228,7 @@
             var satname = filtered_data.map(d => d.satname)
             var mean = Plotly.d3.mean(values)
             values = values.map(v => v ? v - mean : v)
-            console.log(dates, values)
+            console.log("CoastSat", dates, values)
             var min_date = new Date(results.data[0].dates)
             var max_date = new Date(results.data[results.data.length - 1].dates)
             var datediff = (max_date - min_date) / 1000 / 60 / 60 / 24 / 365.25
@@ -256,7 +256,7 @@
               r.WCI = parseFloat(r.WCI)
               r.LCI = parseFloat(r.LCI)
               NZCCD_values = NZCCD_values.map(v => v ? v - mean : v)
-              console.log(dates, values)
+              console.log("NZCCD", NZCCD_dates, NZCCD_values)
               var NZCCD_min_date = new Date(NZCCD_dates[0])
               var NZCCD_max_date = new Date(NZCCD_dates[NZCCD_dates.length - 1])
               var NZCCD_datediff = (NZCCD_max_date - NZCCD_min_date) / 1000 / 60 / 60 / 24 / 365.25
@@ -321,8 +321,7 @@
             px.y -= 400;
             map.panTo(map.unproject(px), { animate: true });
             if (p.site_id.startsWith("nzd")) {
-              var url = `Data/${p.site_id}/transect_time_series.csv`
-              Papa.parse(url, {
+              Papa.parse(vedgesat_url, {
                 download: true,
                 header: true,
                 dynamicTyping: true,
@@ -334,7 +333,7 @@
                   var vedgesat_values = filtered_data.map(d => d[p.id])
                   var vedgesat_satname = filtered_data.map(d => d.satname)
                   vedgesat_values = vedgesat_values.map(v => v ? v - mean : v)
-                  console.log(dates, values)
+                  console.log("VedgeSat", dates, vedgesat_values)
                   Plotly.addTraces("plot", {
                     type: "scatter",
                     mode: "lines+markers",

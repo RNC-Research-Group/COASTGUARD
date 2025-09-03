@@ -59,7 +59,7 @@ import geopandas as gpd
 import csv
 import math
 
-ee.Initialize()
+#ee.Initialize()
 
 
 # SCALING:
