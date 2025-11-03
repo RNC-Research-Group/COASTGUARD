@@ -22,8 +22,10 @@ import sys
 
 start = time.time()
 
-ee.Initialize()
-ee.Authenticate()
+# Earth engine service account
+service_account = 'service-account@iron-dynamics-294100.iam.gserviceaccount.com'
+credentials = ee.ServiceAccountCredentials(service_account, '../CoastSat/.private-key.json')
+ee.Initialize(credentials)
 
 shorelines = gpd.read_file("../CoastSat/shorelines.geojson")
 shorelines = shorelines[shorelines.id.str.startswith("nzd")]
