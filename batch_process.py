@@ -126,7 +126,9 @@ def process_site(sitename):
     )
     output, output_latlon, output_proj = Toolbox.ReadOutput(inputs)
     output = Toolbox.RemoveDuplicates(output)
-    print(output)
+    if len(output['veglines']) == 0:
+        print(f"No veglines found for {sitename}")
+        return
 
     # Save output veglines
     Toolbox.SaveConvShapefiles(output, LinesPath, sitename, settings["output_epsg"])
