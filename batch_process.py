@@ -39,8 +39,11 @@ sys.stdout = open("batch.log", "w")
 
 
 def process_site(sitename):
-    os.unlink(f"Data/{sitename}/lines/{sitename}_metadata.pkl")
-    os.unlink(f"Data/{sitename}/lines/{sitename}_output.pkl")
+    try:
+        os.unlink(f"Data/{sitename}/{sitename}_metadata.pkl")
+        os.unlink(f"Data/{sitename}/{sitename}_output.pkl")
+    except Exception:
+        pass
 
     shorelines[shorelines.id == sitename].to_file(
         f"Data/referenceLines/{sitename}.geojson"
