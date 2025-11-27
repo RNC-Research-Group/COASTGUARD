@@ -47,7 +47,7 @@ def process_site(sitename):
         pass
 
     bbox = poly[poly.id == sitename].geometry.iloc[0]
-    clipped_mhwl = mhwl.clip(bbox).dissolve().to_crs(4326)
+    clipped_mhwl = mhwl.clip(bbox).to_crs(4326)
     clipped_mhwl.to_file(f"Data/referenceLines/{sitename}.geojson")
 
     dates = ["1900-01-01", "2030-01-01"]
