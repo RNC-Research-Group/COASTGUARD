@@ -47,28 +47,16 @@ def process_site(sitename):
         pass
 
     bbox = poly[poly.id == sitename].geometry.iloc[0]
-    clipped_mhwl = mhwl.clip(bbox).to_crs(4326)
-    clipped_mhwl.to_file(f"Data/referenceLines/{sitename}.geojson")
+    clipped_mhwl = mhwl.clip(bbox)
 
     dates = ["1900-01-01", "2030-01-01"]
     sat_list = ["L5", "L7", "L8", "L9"]
 
     cloud_thresh = 0.5
     wetdry = False
-    referenceLineShp = sitename + ".geojson"
     max_dist_ref = 80
 
     filepath = Toolbox.CreateFileStructure(sitename, sat_list)
-
-    # Return AOI from reference line bounding box and save AOI folium map HTML in sitename directory
-    referenceLinePath = os.path.join(filepath, "referenceLines", referenceLineShp)
-    referenceLineDF = gpd.read_file(referenceLinePath)
-    polygon, point, lonmin, lonmax, latmin, latmax = Toolbox.AOIfromLine(
-        referenceLinePath, max_dist_ref, sitename
-    )
-
-    # It's recommended to convert the polygon to the smallest rectangle (sides parallel to coordinate axes)
-    polygon = Toolbox.smallest_rectangle(polygon)
 
     if len(dates) > 2:
         daterange = "no"
@@ -80,6 +68,8 @@ def process_site(sitename):
             datetime.strptime(dates[-1], "%Y-%m-%d"),
         )
     )
+
+    polygon = poly[poly.id == sitename].to_crs(4326).geometry.iloc[0]
 
     inputs = {
         "polygon": polygon,
@@ -99,7 +89,7 @@ def process_site(sitename):
 
     os.makedirs(LinesPath, exist_ok=True)
 
-    projection_epsg, _ = Toolbox.FindUTM(polygon[0][0][1], polygon[0][0][0])
+    projection_epsg = 2193
 
     settings = {
         # general parameters:
@@ -121,10 +111,9 @@ def process_site(sitename):
         "year_list": years,
     }
 
-    referenceLine, ref_epsg = Toolbox.ProcessRefline(referenceLinePath, settings)
 
-    settings["reference_shoreline"] = referenceLine
-    settings["ref_epsg"] = ref_epsg
+    settings["reference_shoreline"] = clipped_mhwl.to_crs(projection_epsg)
+    settings["ref_epsg"] = projection_epsg
     settings["max_dist_ref"] = max_dist_ref
     settings["reference_coreg_im"] = None
 
