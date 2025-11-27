@@ -27,11 +27,12 @@ service_account = 'service-account@iron-dynamics-294100.iam.gserviceaccount.com'
 credentials = ee.ServiceAccountCredentials(service_account, '../CoastSat/.private-key.json')
 ee.Initialize(credentials)
 
-shorelines = gpd.read_file("../CoastSat/shorelines.geojson")
-shorelines = shorelines[shorelines.id.str.startswith("nzd")]
+poly = gpd.read_file("../CoastSat/polygons.geojson")
+poly = poly[poly.id.str.startswith("nzd")].to_crs(2193)
+mhwl = gpd.read_file("lds-nz-coastline-mean-high-water-GPKG.zip!nz-coastline-mean-high-water.gpkg")
 transects = gpd.read_file("../CoastSat/transects_extended.geojson")
 
-print(f"{time.time() - start}: Reference shorelines and transects loaded")
+print(f"{time.time() - start}: Reference polygons and transects loaded")
 
 os.makedirs("Data/referenceLines", exist_ok=True)
 
@@ -45,9 +46,9 @@ def process_site(sitename):
     except Exception:
         pass
 
-    shorelines[shorelines.id == sitename].to_file(
-        f"Data/referenceLines/{sitename}.geojson"
-    )
+    bbox = poly[poly.id == sitename].geometry.iloc[0]
+    clipped_mhwl = mhwl.clip(bbox).dissolve().to_crs(4326)
+    clipped_mhwl.to_file(f"Data/referenceLines/{sitename}.geojson")
 
     dates = ["1900-01-01", "2030-01-01"]
     sat_list = ["L5", "L7", "L8", "L9"]
@@ -55,7 +56,7 @@ def process_site(sitename):
     cloud_thresh = 0.5
     wetdry = False
     referenceLineShp = sitename + ".geojson"
-    max_dist_ref = 200
+    max_dist_ref = 80
 
     filepath = Toolbox.CreateFileStructure(sitename, sat_list)
 
@@ -178,7 +179,7 @@ def process_site(sitename):
 
 process_map(
     process_site,
-    shorelines.id.unique(),
+    poly.id.unique(),
     max_workers=32,
     chunksize=1,
     desc="Processing sites",
