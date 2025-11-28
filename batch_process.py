@@ -19,6 +19,7 @@ import ee
 import geopandas as gpd
 import time
 import sys
+import numpy as np
 
 start = time.time()
 
@@ -69,7 +70,8 @@ def process_site(sitename):
         )
     )
 
-    polygon = poly[poly.id == sitename].to_crs(4326).geometry.iloc[0]
+    polygon = [poly[poly.id == sitename].to_crs(4326).geometry.iloc[0]]
+    polygon = Toolbox.smallest_rectangle(polygon)
 
     inputs = {
         "polygon": polygon,
@@ -129,8 +131,8 @@ def process_site(sitename):
     # Save output veglines
     Toolbox.SaveConvShapefiles(output, LinesPath, sitename, settings["output_epsg"])
     VegBasePath = "Data/" + sitename + "/lines"
-    VeglineShp = glob(LinesPath + "/*veglines.shp")
-    VeglineGDF = gpd.read_file(VeglineShp[0])
+    VeglineShp = sorted(glob(LinesPath + "/*veglines.shp"))
+    VeglineGDF = gpd.read_file(VeglineShp[-1])
     if len(VeglineGDF) == 0:
         print(f"No veglines found for {sitename}")
         return
