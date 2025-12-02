@@ -91,7 +91,7 @@ def process_site(sitename):
 
     os.makedirs(LinesPath, exist_ok=True)
 
-    projection_epsg = 32760
+    projection_epsg, _ = Toolbox.FindUTM(polygon[0][0][1], polygon[0][0][0])
 
     settings = {
         # general parameters:

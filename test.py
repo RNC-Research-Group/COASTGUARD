@@ -88,10 +88,10 @@ LinesPath = "Data/" + sitename + "/lines"
 
 os.makedirs(LinesPath, exist_ok=True)
 
-#projection_epsg, _ = Toolbox.FindUTM(polygon[0][0][1], polygon[0][0][0])
-#print(projection_epsg)
+projection_epsg, _ = Toolbox.FindUTM(polygon[0][0][1], polygon[0][0][0])
+print(projection_epsg)
 #projection_epsg = 2193
-projection_epsg = 32760
+#projection_epsg = 32760
 
 settings = {
     # general parameters:
