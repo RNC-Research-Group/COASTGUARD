@@ -91,7 +91,7 @@ def process_site(sitename):
 
     os.makedirs(LinesPath, exist_ok=True)
 
-    projection_epsg = 2193
+    projection_epsg = 32760
 
     settings = {
         # general parameters:
@@ -114,8 +114,8 @@ def process_site(sitename):
     }
 
 
-    settings["reference_shoreline"] = clipped_mhwl.to_crs(projection_epsg)
-    settings["ref_epsg"] = projection_epsg
+    settings["reference_shoreline"] = clipped_mhwl
+    settings["ref_epsg"] = 4326
     settings["max_dist_ref"] = max_dist_ref
     settings["reference_coreg_im"] = None
 
